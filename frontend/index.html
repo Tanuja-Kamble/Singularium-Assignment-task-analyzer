@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Task Analyzer</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Smart Task Analyzer</h1>
+            <p class="subtitle">Intelligently prioritize your tasks and know what to work on first</p>
+        </header>
+
+        <main class="main-content">
+            <section class="input-section">
+                <div class="section-header">
+                    <h2>Add Tasks</h2>
+                    <div class="input-toggle">
+                        <button class="toggle-btn active" data-mode="form">Form Input</button>
+                        <button class="toggle-btn" data-mode="json">JSON Input</button>
+                    </div>
+                </div>
+
+                <div id="formInput" class="input-mode active">
+                    <form id="taskForm" class="task-form">
+                        <div class="form-group">
+                            <label for="title">Task Title *</label>
+                            <input type="text" id="title" name="title" required placeholder="e.g., Complete project documentation">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="dueDate">Due Date *</label>
+                                <input type="date" id="dueDate" name="dueDate" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="importance">Importance (1-10)</label>
+                                <input type="number" id="importance" name="importance" min="1" max="10" value="5">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="estimatedHours">Estimated Hours</label>
+                                <input type="number" id="estimatedHours" name="estimatedHours" min="1" value="1">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dependencies">Dependencies (Task IDs, comma-separated)</label>
+                            <input type="text" id="dependencies" name="dependencies" placeholder="e.g., 1, 2, 3">
+                        </div>
+
+                        <button type="submit" class="btn btn-secondary">Add Task to List</button>
+                    </form>
+
+                    <div class="pending-tasks">
+                        <h3>Tasks to Analyze (<span id="taskCount">0</span>)</h3>
+                        <div id="taskList" class="task-list-preview"></div>
+                    </div>
+                </div>
+
+                <div id="jsonInput" class="input-mode">
+                    <div class="form-group">
+                        <label for="jsonTextarea">Paste JSON Array of Tasks</label>
+                        <textarea id="jsonTextarea" placeholder='[
+  {
+    "id": 1,
+    "title": "Fix login bug",
+    "due_date": "2025-11-30",
+    "importance": 8,
+    "estimated_hours": 2,
+    "dependencies": []
+  },
+  {
+    "id": 2,
+    "title": "Write documentation",
+    "due_date": "2025-12-05",
+    "importance": 6,
+    "estimated_hours": 4,
+    "dependencies": [1]
+  }
+]'></textarea>
+                    </div>
+                    <button id="loadJsonBtn" class="btn btn-secondary">Load JSON</button>
+                </div>
+
+                <div class="controls">
+                    <div class="strategy-selector">
+                        <label for="strategy">Sorting Strategy:</label>
+                        <select id="strategy">
+                            <option value="smart_balance">Smart Balance (Recommended)</option>
+                            <option value="fastest_wins">Fastest Wins</option>
+                            <option value="high_impact">High Impact</option>
+                            <option value="deadline_driven">Deadline Driven</option>
+                        </select>
+                    </div>
+                    <div class="action-buttons">
+                        <button id="analyzeBtn" class="btn btn-primary" disabled>Analyze Tasks</button>
+                        <button id="suggestBtn" class="btn btn-outline">Get Top 3 Suggestions</button>
+                        <button id="clearBtn" class="btn btn-danger">Clear All</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="results-section">
+                <div class="section-header">
+                    <h2>Results</h2>
+                    <div id="loadingIndicator" class="loading hidden">
+                        <span class="spinner"></span> Analyzing...
+                    </div>
+                </div>
+
+                <div id="errorMessage" class="error-message hidden"></div>
+                <div id="warningMessage" class="warning-message hidden"></div>
+
+                <div id="resultsContainer" class="results-container">
+                    <div class="empty-state">
+                        <p>Add tasks and click "Analyze Tasks" to see prioritized results</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="strategy-info">
+                <h3>Strategy Guide</h3>
+                <div class="strategy-cards">
+                    <div class="strategy-card">
+                        <strong>Smart Balance</strong>
+                        <p>Considers urgency, importance, effort, and dependencies equally for optimal prioritization.</p>
+                    </div>
+                    <div class="strategy-card">
+                        <strong>Fastest Wins</strong>
+                        <p>Prioritizes quick tasks to build momentum and clear your backlog faster.</p>
+                    </div>
+                    <div class="strategy-card">
+                        <strong>High Impact</strong>
+                        <p>Focuses on high-importance tasks regardless of deadline or effort.</p>
+                    </div>
+                    <div class="strategy-card">
+                        <strong>Deadline Driven</strong>
+                        <p>Prioritizes tasks by urgency, ensuring you never miss a deadline.</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
