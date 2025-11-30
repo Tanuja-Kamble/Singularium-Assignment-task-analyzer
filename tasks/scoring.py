@@ -44,13 +44,13 @@ def parse_date(date_value: Any) -> Optional[date]:
     """
     if date_value is None:
         return None
-    
+
     if isinstance(date_value, date):
         return date_value
-    
+
     if isinstance(date_value, datetime):
         return date_value.date()
-    
+
     if isinstance(date_value, str):
         try:
             return datetime.strptime(date_value, '%Y-%m-%d').date()
@@ -59,7 +59,7 @@ def parse_date(date_value: Any) -> Optional[date]:
                 return datetime.strptime(date_value, '%m/%d/%Y').date()
             except ValueError:
                 return None
-    
+
     return None
 
 
@@ -77,23 +77,27 @@ def validate_task(task_data: Dict) -> Dict:
         'id': task_data.get('id'),
         'validation_warnings': []
     }
-    
+
     importance = task_data.get('importance')
     if importance is not None:
         try:
             importance = int(importance)
             if importance < 1:
                 importance = 1
-                validated['validation_warnings'].append('Importance adjusted to minimum (1)')
+                validated['validation_warnings'].append(
+                    'Importance adjusted to minimum (1)')
             elif importance > 10:
                 importance = 10
-                validated['validation_warnings'].append('Importance adjusted to maximum (10)')
+                validated['validation_warnings'].append(
+                    'Importance adjusted to maximum (10)')
             validated['importance'] = importance
         except (ValueError, TypeError):
-            validated['validation_warnings'].append('Invalid importance value, using default (5)')
+            validated['validation_warnings'].append(
+                'Invalid importance value, using default (5)')
     else:
-        validated['validation_warnings'].append('Missing importance, using default (5)')
-    
+        validated['validation_warnings'].append(
+            'Missing importance, using default (5)')
+
     estimated_hours = task_data.get('estimated_hours')
     if estimated_hours is not None:
         try:
@@ -102,17 +106,19 @@ def validate_task(task_data: Dict) -> Dict:
                 estimated_hours = 1
             validated['estimated_hours'] = estimated_hours
         except (ValueError, TypeError):
-            validated['validation_warnings'].append('Invalid estimated_hours, using default (1)')
-    
+            validated['validation_warnings'].append(
+                'Invalid estimated_hours, using default (1)')
+
     dependencies = task_data.get('dependencies', [])
     if isinstance(dependencies, list):
         validated['dependencies'] = dependencies
     else:
-        validated['validation_warnings'].append('Invalid dependencies format, using empty list')
-    
+        validated['validation_warnings'].append(
+            'Invalid dependencies format, using empty list')
+
     if validated['due_date'] is None:
         validated['validation_warnings'].append('Missing or invalid due_date')
-    
+
     return validated
 
 
@@ -123,9 +129,9 @@ def calculate_urgency_score(due_date: Optional[date], today: date) -> tuple:
     """
     if due_date is None:
         return 0, "No due date specified"
-    
+
     days_until_due = (due_date - today).days
-    
+
     if days_until_due < 0:
         days_overdue = abs(days_until_due)
         return 100, f"OVERDUE by {days_overdue} day(s)!"
@@ -155,7 +161,7 @@ def calculate_importance_score(importance: int) -> tuple:
         explanation = f"Medium importance ({importance}/10)"
     else:
         explanation = f"Low importance ({importance}/10)"
-    
+
     return score, explanation
 
 
@@ -182,25 +188,23 @@ def calculate_dependency_score(task_id: Any, all_tasks: List[Dict]) -> tuple:
     """
     if task_id is None:
         return 0, "No dependency bonus"
-    
+
     blocking_count = 0
     for task in all_tasks:
         deps = task.get('dependencies', [])
         if task_id in deps:
             blocking_count += 1
-    
+
     if blocking_count > 0:
         score = blocking_count * 20
         return score, f"Blocks {blocking_count} other task(s)"
-    
+
     return 0, "No dependency bonus"
 
 
-def calculate_task_score(
-    task_data: Dict,
-    all_tasks: List[Dict] = None,
-    strategy: str = 'smart_balance'
-) -> Dict:
+def calculate_task_score(task_data: Dict,
+                         all_tasks: List[Dict] = None,
+                         strategy: str = 'smart_balance') -> Dict:
     """
     Calculate the priority score for a task using the specified strategy.
     
@@ -214,38 +218,38 @@ def calculate_task_score(
     """
     if all_tasks is None:
         all_tasks = []
-    
+
     today = date.today()
     validated_task = validate_task(task_data)
-    
+
     urgency_score, urgency_explanation = calculate_urgency_score(
-        validated_task['due_date'], today
-    )
+        validated_task['due_date'], today)
     importance_score, importance_explanation = calculate_importance_score(
-        validated_task['importance']
-    )
+        validated_task['importance'])
     effort_score, effort_explanation = calculate_effort_score(
-        validated_task['estimated_hours']
-    )
+        validated_task['estimated_hours'])
     dependency_score, dependency_explanation = calculate_dependency_score(
-        validated_task.get('id'), all_tasks
-    )
-    
+        validated_task.get('id'), all_tasks)
+
     if strategy == 'fastest_wins':
-        total_score = (effort_score * 3) + (urgency_score * 0.5) + (importance_score * 0.3)
+        total_score = (effort_score * 3) + (urgency_score *
+                                            0.5) + (importance_score * 0.3)
         strategy_description = "Prioritizing quick wins"
     elif strategy == 'high_impact':
-        total_score = (importance_score * 3) + (urgency_score * 0.5) + (effort_score * 0.2)
+        total_score = (importance_score * 3) + (urgency_score *
+                                                0.5) + (effort_score * 0.2)
         strategy_description = "Prioritizing high-impact tasks"
     elif strategy == 'deadline_driven':
-        total_score = (urgency_score * 3) + (importance_score * 0.5) + (effort_score * 0.2)
+        total_score = (urgency_score * 3) + (importance_score *
+                                             0.5) + (effort_score * 0.2)
         strategy_description = "Prioritizing deadlines"
     else:
         total_score = urgency_score + importance_score + effort_score + dependency_score
         strategy_description = "Balanced priority scoring"
-    
-    priority_level = 'high' if total_score >= 100 else ('medium' if total_score >= 50 else 'low')
-    
+
+    priority_level = 'high' if total_score >= 100 else (
+        'medium' if total_score >= 50 else 'low')
+
     explanation_parts = []
     if urgency_score > 0:
         explanation_parts.append(urgency_explanation)
@@ -253,40 +257,53 @@ def calculate_task_score(
     explanation_parts.append(effort_explanation)
     if dependency_score > 0:
         explanation_parts.append(dependency_explanation)
-    
+
     return {
-        'id': validated_task.get('id'),
-        'title': validated_task['title'],
-        'due_date': validated_task['due_date'].isoformat() if validated_task['due_date'] else None,
-        'importance': validated_task['importance'],
-        'estimated_hours': validated_task['estimated_hours'],
-        'dependencies': validated_task['dependencies'],
-        'score': round(total_score, 2),
-        'priority_level': priority_level,
+        'id':
+        validated_task.get('id'),
+        'title':
+        validated_task['title'],
+        'due_date':
+        validated_task['due_date'].isoformat()
+        if validated_task['due_date'] else None,
+        'importance':
+        validated_task['importance'],
+        'estimated_hours':
+        validated_task['estimated_hours'],
+        'dependencies':
+        validated_task['dependencies'],
+        'score':
+        round(total_score, 2),
+        'priority_level':
+        priority_level,
         'score_breakdown': {
             'urgency': urgency_score,
             'importance': importance_score,
             'effort': effort_score,
             'dependency': dependency_score
         },
-        'explanation': ' | '.join(explanation_parts),
-        'strategy': strategy_description,
-        'validation_warnings': validated_task['validation_warnings']
+        'explanation':
+        ' | '.join(explanation_parts),
+        'strategy':
+        strategy_description,
+        'validation_warnings':
+        validated_task['validation_warnings']
     }
 
 
-def analyze_tasks(tasks: List[Dict], strategy: str = 'smart_balance') -> List[Dict]:
+def analyze_tasks(tasks: List[Dict],
+                  strategy: str = 'smart_balance') -> List[Dict]:
     """
     Analyze a list of tasks and return them sorted by priority score.
     """
     scored_tasks = []
-    
+
     for task in tasks:
         scored_task = calculate_task_score(task, tasks, strategy)
         scored_tasks.append(scored_task)
-    
+
     scored_tasks.sort(key=lambda x: x['score'], reverse=True)
-    
+
     return scored_tasks
 
 
@@ -296,36 +313,33 @@ def get_top_suggestions(tasks: List[Dict], count: int = 3) -> List[Dict]:
     """
     analyzed = analyze_tasks(tasks, strategy='smart_balance')
     top_tasks = analyzed[:count]
-    
+
     suggestions = []
     for i, task in enumerate(top_tasks, 1):
         why_reasons = []
         breakdown = task['score_breakdown']
-        
+
         if breakdown['urgency'] >= 80:
             why_reasons.append("This task is due very soon or overdue")
         elif breakdown['urgency'] >= 30:
             why_reasons.append("This task has an upcoming deadline")
-        
+
         if task['importance'] >= 8:
             why_reasons.append("It has high importance to you")
-        
+
         if breakdown['effort'] >= 10:
             why_reasons.append("It's a quick win that can be completed fast")
-        
+
         if breakdown['dependency'] > 0:
             why_reasons.append("Other tasks are waiting on this one")
-        
+
         if not why_reasons:
-            why_reasons.append("It has a balanced priority based on all factors")
-        
-        suggestion = {
-            **task,
-            'rank': i,
-            'why_work_on_this': why_reasons
-        }
+            why_reasons.append(
+                "It has a balanced priority based on all factors")
+
+        suggestion = {**task, 'rank': i, 'why_work_on_this': why_reasons}
         suggestions.append(suggestion)
-    
+
     return suggestions
 
 
@@ -336,11 +350,11 @@ def detect_circular_dependencies(tasks: List[Dict]) -> List[str]:
     """
     warnings = []
     task_ids = {task.get('id') for task in tasks if task.get('id') is not None}
-    
+
     def has_circular_dep(task_id, visited, rec_stack):
         visited.add(task_id)
         rec_stack.add(task_id)
-        
+
         task = next((t for t in tasks if t.get('id') == task_id), None)
         if task:
             for dep_id in task.get('dependencies', []):
@@ -351,16 +365,18 @@ def detect_circular_dependencies(tasks: List[Dict]) -> List[str]:
                         return True
                 elif dep_id in rec_stack:
                     return True
-        
+
         rec_stack.remove(task_id)
         return False
-    
+
     visited = set()
     for task in tasks:
         task_id = task.get('id')
         if task_id and task_id not in visited:
             rec_stack = set()
             if has_circular_dep(task_id, visited, rec_stack):
-                warnings.append(f"Circular dependency detected involving task ID: {task_id}")
-    
+                warnings.append(
+                    f"Circular dependency detected involving task ID: {task_id}"
+                )
+
     return warnings

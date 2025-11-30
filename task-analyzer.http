@@ -1,0 +1,104 @@
+### HEALTH CHECK (optional)
+GET http://127.0.0.1:8000/
+
+### ANALYZE TASKS — Smart Balance (default)
+POST http://127.0.0.1:8000/api/tasks/analyze/?strategy=Smart%20Balance
+Content-Type: application/json
+
+{
+  "strategy": "Smart Balance",
+  "tasks": [
+    { "id": "A", "title": "Fix API bug", "due_date": "2025-11-30", "estimated_hours": 3, "importance": 9, "dependencies": [] },
+    { "id": "B", "title": "Write documentation", "due_date": "2025-12-05", "estimated_hours": 2, "importance": 5, "dependencies": ["A"] },
+    { "id": "C", "title": "Deploy release", "due_date": "2025-11-29", "estimated_hours": 1, "importance": 10, "dependencies": [] }
+  ]
+}
+
+### ANALYZE TASKS — Fastest Wins strategy
+POST http://127.0.0.1:8000/api/tasks/analyze/?strategy=Fastest%20Wins
+Content-Type: application/json
+
+{
+  "strategy": "Fastest Wins",
+  "tasks": [
+    { "id": "A", "title": "Fix API bug", "due_date": "2025-11-30", "estimated_hours": 3, "importance": 9, "dependencies": [] },
+    { "id": "B", "title": "Write documentation", "due_date": "2025-12-05", "estimated_hours": 2, "importance": 5, "dependencies": ["A"] },
+    { "id": "C", "title": "Deploy release", "due_date": "2025-11-29", "estimated_hours": 1, "importance": 10, "dependencies": [] }
+  ]
+}
+
+### ANALYZE TASKS — High Impact strategy
+POST http://127.0.0.1:8000/api/tasks/analyze/?strategy=High%20Impact
+Content-Type: application/json
+
+{
+  "strategy": "High Impact",
+  "tasks": [
+    { "id": "A", "title": "Fix API bug", "due_date": "2025-11-30", "estimated_hours": 3, "importance": 9, "dependencies": [] },
+    { "id": "B", "title": "Write documentation", "due_date": "2025-12-05", "estimated_hours": 2, "importance": 5, "dependencies": ["A"] },
+    { "id": "C", "title": "Deploy release", "due_date": "2025-11-29", "estimated_hours": 1, "importance": 10, "dependencies": [] }
+  ]
+}
+
+### ANALYZE TASKS — Deadline Driven strategy
+POST http://127.0.0.1:8000/api/tasks/analyze/?strategy=Deadline%20Driven
+Content-Type: application/json
+
+{
+  "strategy": "Deadline Driven",
+  "tasks": [
+    { "id": "A", "title": "Fix API bug", "due_date": "2025-11-30", "estimated_hours": 3, "importance": 9, "dependencies": [] },
+    { "id": "B", "title": "Write documentation", "due_date": "2025-12-05", "estimated_hours": 2, "importance": 5, "dependencies": ["A"] },
+    { "id": "C", "title": "Deploy release", "due_date": "2025-11-29", "estimated_hours": 1, "importance": 10, "dependencies": [] }
+  ]
+}
+
+### GET TOP 3 SUGGESTIONS
+GET http://127.0.0.1:8000/api/tasks/suggest/?strategy=Smart%20Balance&tasks=[
+  {
+    "id": "A",
+    "title": "Fix API bug",
+    "due_date": "2025-11-30",
+    "estimated_hours": 3,
+    "importance": 9,
+    "dependencies": []
+  },
+  {
+    "id": "B",
+    "title": "Write documentation",
+    "due_date": "2025-12-05",
+    "estimated_hours": 2,
+    "importance": 5,
+    "dependencies": ["A"]
+  },
+  {
+    "id": "C",
+    "title": "Deploy release",
+    "due_date": "2025-11-29",
+    "estimated_hours": 1,
+    "importance": 10,
+    "dependencies": []
+  }
+]
+
+### TEST — Circular Dependency Error
+POST http://127.0.0.1:8000/api/tasks/analyze/?strategy=Smart%20Balance
+Content-Type: application/json
+
+{
+  "strategy": "Smart Balance",
+  "tasks": [
+    { "id": "A", "title": "Task A", "due_date": "2025-11-30", "estimated_hours": 2, "importance": 7, "dependencies": ["B"] },
+    { "id": "B", "title": "Task B", "due_date": "2025-11-30", "estimated_hours": 2, "importance": 7, "dependencies": ["A"] }
+  ]
+}
+
+### TEST — Missing Values
+POST http://127.0.0.1:8000/api/tasks/analyze/?strategy=Smart%20Balance
+Content-Type: application/json
+
+{
+  "tasks": [
+    { "title": "Untitled Task" }
+  ]
+}

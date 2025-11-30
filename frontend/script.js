@@ -158,7 +158,8 @@ async function analyzeTasks() {
     hideWarning();
 
     try {
-        const response = await fetch('/api/tasks/analyze/', {
+        const response = await fetch('http://127.0.0.1:8000/api/tasks/analyze/', {
+
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -196,7 +197,8 @@ async function getSuggestions() {
         let response;
         
         if (pendingTasks.length > 0) {
-            response = await fetch('/api/tasks/suggest/', {
+            response = await fetch('http://127.0.0.1:8000/api/tasks/suggest/', {
+
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

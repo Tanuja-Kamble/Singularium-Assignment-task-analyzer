@@ -112,11 +112,11 @@ python manage.py test tasks
 - `TestGetTopSuggestions` - Tests for suggestion generation
 
 ## Recent Changes
-- Initial implementation (November 2025)
+- Initial implementation
 - Added multi-strategy sorting (Smart Balance, Fastest Wins, High Impact, Deadline Driven)
 - Implemented circular dependency detection
 - Added comprehensive edge case handling
-- Added 32 unit tests for scoring algorithm (November 2025)
+- Added 32 unit tests for scoring algorithm 
 
 ## Technology Stack
 - **Backend**: Python 3.11, Django 5.2
