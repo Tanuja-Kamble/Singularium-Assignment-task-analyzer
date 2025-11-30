@@ -8,8 +8,12 @@ from .scoring import analyze_tasks, get_top_suggestions, detect_circular_depende
 
 
 def index(request):
-    """Serve the main frontend page."""
-    return render(request, 'index.html')
+    """Serve the main frontend page with cache control headers."""
+    response = render(request, 'index.html')
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 
 @csrf_exempt

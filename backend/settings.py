@@ -74,3 +74,10 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'frontend']
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Disable caching for development
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}
