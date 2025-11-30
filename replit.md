@@ -91,11 +91,32 @@ The scoring algorithm weighs multiple factors:
 - **Invalid data**: Validation warnings are returned with the response
 - **Circular dependencies**: Detected and reported as warnings
 
+## Unit Tests
+
+The project includes 32 comprehensive unit tests covering all aspects of the scoring algorithm.
+
+**Run tests with:**
+```bash
+python manage.py test tasks
+```
+
+**Test coverage includes:**
+- `TestUrgencyScoring` - Tests for overdue, due today, tomorrow, 3 days, 7 days
+- `TestImportanceScoring` - Tests for high, medium, low importance values
+- `TestEffortScoring` - Tests for quick wins, medium effort, large tasks
+- `TestDependencyScoring` - Tests for blocking/non-blocking tasks
+- `TestSortingStrategies` - Tests for fastest_wins, high_impact, deadline_driven
+- `TestEdgeCases` - Tests for missing/invalid data handling
+- `TestCircularDependencyDetection` - Tests for cycle detection
+- `TestDateParsing` - Tests for various date formats
+- `TestGetTopSuggestions` - Tests for suggestion generation
+
 ## Recent Changes
 - Initial implementation (November 2025)
 - Added multi-strategy sorting (Smart Balance, Fastest Wins, High Impact, Deadline Driven)
 - Implemented circular dependency detection
 - Added comprehensive edge case handling
+- Added 32 unit tests for scoring algorithm (November 2025)
 
 ## Technology Stack
 - **Backend**: Python 3.11, Django 5.2
